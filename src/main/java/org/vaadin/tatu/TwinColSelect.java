@@ -305,13 +305,17 @@ public class TwinColSelect<T> extends AbstractField<TwinColSelect<T>, Set<T>>
         clearButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         cleanButton = new Button(VaadinIcon.TRASH.create());
         cleanButton.addClickListener(event -> {
+            // true if any value is selected
+            boolean any2 = list2.getChildren().anyMatch(c -> ((Checkbox)c).getValue());
+            // then set all to the negation (any? then all false, none? than all true)
             list2.getChildren().forEach(comp -> {
                 Checkbox checkbox = (Checkbox) comp;
-                checkbox.setValue(false);
+                checkbox.setValue(!any2);
             });
+            boolean any1 = list1.getChildren().anyMatch(c -> ((Checkbox)c).getValue());
             list1.getChildren().forEach(comp -> {
                 Checkbox checkbox = (Checkbox) comp;
-                checkbox.setValue(false);
+                checkbox.setValue(!any1);
             });
         });
         cleanButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
