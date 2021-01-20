@@ -39,6 +39,7 @@ public abstract class AbstractViewTest extends ParallelTest {
         this.route = route;
     }
 
+    @Override
     @Before
     public void setup() throws Exception {
         if (isUsingHub()) {
