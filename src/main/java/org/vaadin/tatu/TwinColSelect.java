@@ -175,6 +175,7 @@ public class TwinColSelect<T> extends AbstractField<TwinColSelect<T>, Set<T>>
                 }
             });
             addClickListener(click -> {
+                // handle doubleclick list swap
                 if (click.getClickCount() == 2) {
                     if (this.getParent().get() == list1) {
                         list1.remove(this);
@@ -185,13 +186,56 @@ public class TwinColSelect<T> extends AbstractField<TwinColSelect<T>, Set<T>>
                     }
                     updateButtons();
                     TwinColSelect.this.setModelValue(getSelectedItems(), true);
+                } else {
+                    // implement range select
+                    if (click.isShiftKey()) {
+                        // Java is unhappy with passing this around
+                        CheckBoxItem<T> anchor = (CheckBoxItem<T>) getAnchor();
+                        if (anchor != null) {
+                            if (anchor.getParent().get() == list1) {
+                                if (this.getParent().get() == list1) {
+                                    markRange(list1, anchor, this);
+                                }
+                            } else {
+                                if (this.getParent().get() == list2) {
+                                    markRange(list2, anchor, this);
+                                }
+                            }
+                        }
+                        setAnchor(null); // always clear the anchor
+                    } else {
+                        // remember the item clicked
+                        setAnchor(this);
+                    }
                 }
+
             });
         }
 
         @Override
         public T getItem() {
             return item;
+        }
+    }
+
+    // again, Java doesn't like passing inner class instances in and out for reasons not entirely clear to me
+    /**
+     * set the value of all children of the list to true which are between a and b, leaving items not between a and b alone
+     * @param list
+     * @param a
+     * @param b
+     */
+    private void markRange(VerticalLayout list, Component a, Component b) {
+        boolean marking = false;
+        for (Component i: list.getChildren().collect(Collectors.toList())) {
+            if (i == a || i == b) {
+                marking = !marking;
+                ((CheckBoxItem<T>) i).setValue(true);
+            } else {
+                if (marking) {
+                    ((CheckBoxItem<T>) i).setValue(true);
+                }
+            }
         }
     }
 
@@ -386,6 +430,18 @@ public class TwinColSelect<T> extends AbstractField<TwinColSelect<T>, Set<T>>
     private CheckBoxItem<T> check = null;
 
     private FilterMode filterMode = FilterMode.ITEMS;
+
+    private CheckBoxItem<T> anchorItem = null;
+
+    private void setAnchor(Component checkBoxItem) {
+        anchorItem = (CheckBoxItem<T>)checkBoxItem;
+    }
+    private void clearAnchor() {
+        anchorItem = null;
+    }
+    private CheckBoxItem<T> getAnchor() {
+        return anchorItem;
+    }
 
     private void sortDestinationList(VerticalLayout list2,
             InMemoryDataProvider<T> dataProvider) {
