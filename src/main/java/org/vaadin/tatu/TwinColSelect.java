@@ -73,7 +73,7 @@ public class TwinColSelect<T> extends AbstractField<TwinColSelect<T>, Set<T>>
 
     /**
      * Defines the filter mode
-     * 
+     *
      * @see setFilterMode(FilterMode)
      */
     public enum FilterMode {
@@ -172,6 +172,19 @@ public class TwinColSelect<T> extends AbstractField<TwinColSelect<T>, Set<T>>
                         lastItem = null;
                         lockBox.setValue(false);
                     }
+                }
+            });
+            addClickListener(click -> {
+                if (click.getClickCount() == 2) {
+                    if (this.getParent().get() == list1) {
+                        list1.remove(this);
+                        list2.add(this);
+                    } else {
+                        list2.remove(this);
+                        list1.add(this);
+                    }
+                    updateButtons();
+                    TwinColSelect.this.setModelValue(getSelectedItems(), true);
                 }
             });
         }
@@ -833,7 +846,7 @@ public class TwinColSelect<T> extends AbstractField<TwinColSelect<T>, Set<T>>
 
     /**
      * Define how data providers filter is applied
-     * 
+     *
      * @param filterMode
      *            Filter mode
      */
